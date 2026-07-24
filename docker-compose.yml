@@ -561,35 +561,15 @@ services:
   ## WORKFLOW-EXPLORER
   #############################
 
-  workflow_explorer_postgres:
-    image: postgres:15-alpine
-    container_name: workflow_explorer_postgres
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: workflow_explorer
-      POSTGRES_USER: workflow_explorer
-      POSTGRES_PASSWORD: workflow_explorer
-    volumes:
-      - ${PRIMARY_MOUNT}/workflow_explorer/postgres:/var/lib/postgresql/data
-    networks:
-      - workflow-explorer-net
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
   workflow_explorer:
     image: ghcr.io/subdavis/personal-workflows:latest
     container_name: workflow_explorer
     restart: unless-stopped
-    depends_on:
-      workflow_explorer_postgres:
-        condition: service_healthy
     volumes:
       - ./etc/workflow-explorer/.env:/app/.env:ro
+      - ${PRIMARY_MOUNT}/workflow_explorer/data:/app/data
     environment:
-      - DBOS_SYSTEM_DATABASE_URL=postgresql://workflow_explorer:workflow_explorer@workflow_explorer_postgres:5432/workflow_explorer
+      - DBOS_SYSTEM_DATABASE_URL=sqlite:////app/data/workflow_explorer.sqlite
       - DBOS_APP_NAME=workflow-explorer
       - JOBS_QUEUE_CONCURRENCY=1
       - PAPERLESS_URL=http://paperless:8000/api
