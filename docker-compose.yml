@@ -565,6 +565,7 @@ services:
     image: ghcr.io/subdavis/personal-workflows:latest
     container_name: workflow_explorer
     restart: unless-stopped
+    user: ${PUID:-1000}
     volumes:
       - ./etc/workflow-explorer/.env:/app/.env:ro
       - ${PRIMARY_MOUNT}/workflow_explorer/data:/app/data
@@ -573,6 +574,7 @@ services:
       - DBOS_APP_NAME=workflow-explorer
       - JOBS_QUEUE_CONCURRENCY=1
       - PAPERLESS_URL=http://paperless:8000/api
+      - GOOGLE_APPLICATION_CREDENTIALS=/run/secrets/gcp_sa
     networks:
       - workflow-explorer-net
       - paperless-private-net
@@ -584,6 +586,8 @@ services:
       - traefik.http.routers.workflow-explorer-rtr.entrypoints=websecure
       - traefik.http.routers.workflow-explorer-rtr.tls=true
       - traefik.http.routers.workflow-explorer-rtr.middlewares=ipallowlist-mddl@docker
+    secrets:
+      - gcp_sa
 
   #############################
   ## RSS-Glue
@@ -978,3 +982,7 @@ networks:
 
 volumes:
   redis-data:
+
+secrets:
+  gcp_sa:
+    file: ./etc/secrets/service-account.json # gitignored locally
