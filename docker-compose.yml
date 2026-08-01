@@ -516,6 +516,8 @@ services:
       - ${SECONDARY_MOUNT}/paperless/valkey:/data
     labels:
       - traefik.enable=false
+    networks:
+      - paperless-private-net
 
   paperless:
     image: ghcr.io/paperless-ngx/paperless-ngx:latest
