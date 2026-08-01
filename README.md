@@ -83,6 +83,7 @@ Resolving the IP address of your home network is annoying because most DNS provi
 ```bash
 cd selfhosted
 cp .env.example .env # edit this
+mkdir etc/secrets # And then put service-account.json in here for workflow-explorer
 
 # make mount points
 mkdir /media/local /media/primary /media/secondary
