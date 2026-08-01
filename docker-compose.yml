@@ -534,7 +534,7 @@ services:
     environment:
       - USERMAP_UID=${PUID:-1000}
       - USERMAP_GID=${PGID:-1000}
-      - PAPERLESS_DBENGINE=postgres
+      - PAPERLESS_DBENGINE=postgresql
       - PAPERLESS_REDIS=redis://paperless_broker:6379
       - PAPERLESS_DBHOST=paperless_db
       - PAPERLESS_DBNAME=paperless
