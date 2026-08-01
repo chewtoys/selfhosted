@@ -507,13 +507,11 @@ services:
       retries: 5
 
   paperless_broker:
-    image: redis:7-alpine
+    image: docker.io/valkey/valkey:9-alpine
     container_name: paperless_broker
     restart: unless-stopped
     volumes:
-      - ${PRIMARY_MOUNT}/paperless/redis:/data
-    networks:
-      - paperless-private-net
+      - ${SECONDARY_MOUNT}/paperless/valkey:/data
     labels:
       - traefik.enable=false
 
@@ -534,6 +532,7 @@ services:
     environment:
       - USERMAP_UID=${PUID:-1000}
       - USERMAP_GID=${PGID:-1000}
+      - PAPERLESS_DBENGINE=postgres
       - PAPERLESS_REDIS=redis://paperless_broker:6379
       - PAPERLESS_DBHOST=paperless_db
       - PAPERLESS_DBNAME=paperless
@@ -545,6 +544,9 @@ services:
       - PAPERLESS_ADMIN_USER=${PAPERLESS_ADMIN_USER}
       - PAPERLESS_ADMIN_PASSWORD=${PAPERLESS_ADMIN_PASSWORD}
       - PAPERLESS_ADMIN_MAIL=${PAPERLESS_ADMIN_MAIL}
+      - PAPERLESS_REMOTE_OCR_ENGINE=${PAPERLESS_REMOTE_OCR_ENGINE}
+      - PAPERLESS_REMOTE_OCR_API_KEY=${PAPERLESS_REMOTE_OCR_API_KEY}
+      - PAPERLESS_REMOTE_OCR_ENDPOINT=${PAPERLESS_REMOTE_OCR_ENDPOINT}
     networks:
       - paperless-net
       - paperless-private-net
@@ -610,6 +612,11 @@ services:
       - ${PRIMARY_MOUNT}/rss-glue/db:/var/data
     networks:
       - rss-glue-net
+    healthcheck:
+      test: ["CMD-SHELL", "curl http://localhost:8000/config"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
 
   #############################
   ## TRANSMISSION_TORRENT
