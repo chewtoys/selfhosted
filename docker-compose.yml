@@ -618,11 +618,6 @@ services:
       - ${PRIMARY_MOUNT}/rss-glue/db:/var/data
     networks:
       - rss-glue-net
-    healthcheck:
-      test: ["CMD-SHELL", "curl http://localhost:8000/config"]
-      interval: 10s
-      timeout: 3s
-      retries: 3
 
   #############################
   ## TRANSMISSION_TORRENT
